@@ -40,8 +40,8 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="warn" size="medium" @click="fetchDataById(scope.row.problemId)"> 详细 </el-button>
-            <el-button type="primary" size="medium" @click="enjoy(scope.row.problemId)"> 来一题 </el-button>
+            <el-button type="primary" size="medium" @click="openEditForm(scope.row.problemId)"> 修改 </el-button>
+            <el-button type="warning" size="medium" @click="remove(scope.row.problemId)"> 删除 </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -61,28 +61,42 @@
       />
     </div>
 
-    <!-- 详细信息框 -->
+    <!-- 新增信息框 -->
     <div>
-      <el-dialog title="详细信息" :visible.sync="detailedFormVisible" width="40%">
+      <el-dialog title="新增信息" :visible.sync="addFormVisible" width="30%">
         <el-form label-position="right" label-width="80px">
-          <el-form-item label="编号"> <el-input v-model="detailedFormData.problemId" disabled /> </el-form-item>
-          <el-form-item label="作者"> <el-input v-model="detailedFormData.userId" disabled /> </el-form-item>
-          <el-form-item label="标题"> <el-input v-model="detailedFormData.title" disabled /> </el-form-item>
-          <el-form-item label="内容"> <el-input v-model="detailedFormData.content" disabled /> </el-form-item>
-          <el-form-item label="类型"> <el-input v-model="detailedFormData.type" disabled /> </el-form-item>
-          <el-form-item label="练习人次"> <el-input v-model="detailedFormData.attemptNum" disabled /> </el-form-item>
-          <el-form-item label="通过人次"> <el-input v-model="detailedFormData.successNum" disabled /> </el-form-item>
-          <el-form-item label="难度"> <el-input v-model="detailedFormData.difficulty" disabled /> </el-form-item>
-          <el-form-item label="时间限制"> <el-input v-model="detailedFormData.runtimeLimit" disabled /> </el-form-item>
-          <el-form-item label="内存限制"> <el-input v-model="detailedFormData.memoryLimit" disabled /> </el-form-item>
-          <el-form-item label="更新时间"> <el-input v-model="detailedFormData.updateTime" disabled /> </el-form-item>
-          <el-form-item label="创建时间"> <el-input v-model="detailedFormData.insertTime" disabled /> </el-form-item>
-
+          <el-form-item label="编号"> <el-input v-model="addFormData.problemId" /> </el-form-item>
+          <el-form-item label="完成状态"> <el-input v-model="addFormData.completionStatus" /> </el-form-item>
+          <el-form-item label="题目"> <el-input v-model="addFormData.problemName" /> </el-form-item>
+          <el-form-item label="类型"> <el-input v-model="addFormData.type" /> </el-form-item>
+          <el-form-item label="标签"> <el-input v-model="addFormData.tag" /> </el-form-item>
+          <el-form-item label="题解"> <el-input v-model="addFormData.solution" /> </el-form-item>
+          <el-form-item label="通过率"> <el-input v-model="addFormData.passPossibility" /> </el-form-item>
+          <el-form-item label="难度"> <el-input v-model="addFormData.level" /> </el-form-item>
         </el-form>
-
         <span slot="footer" class="dialog-footer">
-          <el-button @click="detailedFormVisible = false">确定</el-button>
-          <el-button type="primary" @click="enjoy(detailedFormData.problemId)">来一题</el-button>
+          <el-button @click="addFormVisible = false">取消</el-button>
+          <el-button type="primary" @click="addConfirm()">确定上传并提交审核</el-button>
+        </span>
+      </el-dialog>
+    </div>
+
+    <!-- 修改信息框 -->
+    <div>
+      <el-dialog title="修改信息" :visible.sync="editFormVisible" width="30%">
+        <el-form label-position="right" label-width="80px">
+          <el-form-item label="编号"> <el-input v-model="editFormData.problemId" /> </el-form-item>
+          <el-form-item label="完成状态"> <el-input v-model="editFormData.completionStatus" /> </el-form-item>
+          <el-form-item label="题目"> <el-input v-model="editFormData.problemName" /> </el-form-item>
+          <el-form-item label="类型"> <el-input v-model="editFormData.type" /> </el-form-item>
+          <el-form-item label="标签"> <el-input v-model="editFormData.tag" /> </el-form-item>
+          <el-form-item label="题解"> <el-input v-model="editFormData.solution" /> </el-form-item>
+          <el-form-item label="通过率"> <el-input v-model="editFormData.passPossibility" /> </el-form-item>
+          <el-form-item label="难度"> <el-input v-model="editFormData.level" /> </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="editFormVisible = false">取消</el-button>
+          <el-button type="primary" @click="editConfirm(editFormData.problemId)">确定修改并提交审核</el-button>
         </span>
       </el-dialog>
     </div>
@@ -105,8 +119,10 @@ export default {
       currentPage: 1,
       pageSize: 5,
 
-      detailedFormData: {}, // 详细信息表单数据
-      detailedFormVisible: false // 详细信息表单可见度
+      addFormData: {}, // 新增信息表单数据
+      addFormVisible: false, // 新增信息表单可见度
+      editFormData: {}, // 修改信息表单数据
+      editFormVisible: false // 修改信息表单可见度
 
     }
   },
@@ -126,9 +142,14 @@ export default {
       this.fetchData()
     },
 
-    // 清除详细信息表单数据
-    detailedFormClear() {
-      this.detailedFormData = {}
+    // 清除新增信息表单数据
+    addFormVisibleFormClear() {
+      this.addFormData = {}
+    },
+
+    // 清除修改信息表单数据
+    editFormVisibleFormClear() {
+      this.editFormData = {}
     },
 
     // 获取全部数据
@@ -148,28 +169,56 @@ export default {
       })
     },
 
-    // 获取id对应数据的详细信息
-    fetchDataById(problemId) {
-      this.detailedFormClear()
+    // 打开新增窗口
+    openAddForm() {
+      // TODO: 提供新增多级的页面
+      this.addFormVisibleFormClear()
+      this.addFormVisible = true
+    },
+
+    // 新增题目
+    addConfirm() {
+      // TODO: 上传接口
+      this.$message.success('已上传题目, 待审核')
+      this.addFormVisible = false
+      this.fetchData()
+    },
+
+    // 打开修改窗口
+    openEditForm(problemId) {
+      this.editFormVisibleFormClear()
       getById(problemId).then(response => {
         if (response.success === true) {
-          this.detailedFormVisible = true
-          this.detailedFormData = response.data.problem
-          this.detailedFormData.problemId = problemId
+          this.editFormVisible = true
+          this.editFormData = response.data.problem
+          this.editFormData.problemId = problemId
         } else { this.$message.error(response.message) }
       })
     },
 
-    // 享受oj
-    enjoy(problemId) {
-      // alert('享受OJ: ' + problemId)
-      this.$router.push({
-        path: '/problem_set/problem',
-        query: {
-          problemId: problemId
-        }
+    // 确认修改
+    editConfirm(problemId) {
+      // TODO: 修改接口，提供修改题目内容，测试用例的按钮
+      this.$message.success('已提交修改审核')
+      this.editFormVisible = false
+      this.fetchData()
+    },
+
+    // 删除
+    remove(problemId) {
+      this.$confirm('此操作将永久删除该题目(problemId: ' + problemId + '), 是否继续?', '提示', {
+        confirmButtonText: '确定并提交审核',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // TODO: 删除接口
+        this.$message.success('已提交删除审核')
+        this.fetchData()
+      }).catch(() => {
+        this.$message.info('已取消删除')
       })
     }
+
   }
 }
 </script>
