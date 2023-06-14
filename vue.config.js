@@ -1,6 +1,7 @@
 'use strict'
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
+const { auto } = require('html-webpack-plugin/lib/chunksorter')
 
 function resolve(dir) {
   return path.join(__dirname, dir)

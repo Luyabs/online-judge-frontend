@@ -7,20 +7,12 @@
         <el-col :span="14" style="margin-top: 20px; margin-left: 20px;">
           <el-descriptions title="垂直带边框列表" direction="vertical" :column="4" border>
             <el-descriptions-item label="编号">{{ descriptionData.problemId }}</el-descriptions-item>
-            <el-descriptions-item label="完成状态">
-              <el-button v-if="descriptionData.completionStatus === '已完成'" size="small" type="success">{{ descriptionData.completionStatus }}</el-button>
-              <el-button v-if="descriptionData.completionStatus === '尝试中'" size="small" type="danger">{{ descriptionData.completionStatus }}</el-button>
-              <el-button v-if="descriptionData.completionStatus === '未完成'" size="small" type="info">{{ descriptionData.completionStatus }}</el-button>
-            </el-descriptions-item>
-            <el-descriptions-item label="题目">{{ descriptionData.problemName }}</el-descriptions-item>
+            <el-descriptions-item label="标题">{{ descriptionData.title }}</el-descriptions-item>
             <el-descriptions-item label="类型">{{ descriptionData.type }}</el-descriptions-item>
-            <el-descriptions-item label="标签">{{ descriptionData.tag }}</el-descriptions-item>
-            <el-descriptions-item label="题解">{{ descriptionData.solution }}</el-descriptions-item>
-            <el-descriptions-item label="通过率">{{ descriptionData.passPossibility }}</el-descriptions-item>
             <el-descriptions-item label="难度">
-              <el-button v-if="descriptionData.level === 'EZ'" size="small" type="success" plain>{{ descriptionData.level }}</el-button>
-              <el-button v-if="descriptionData.level === 'MEDIUM'" size="small" type="warning" plain>{{ descriptionData.level }}</el-button>
-              <el-button v-if="descriptionData.level === 'CRAZY'" size="small" type="danger" plain>{{ descriptionData.level }}</el-button>
+              <el-button v-if="descriptionData.difficulty === 1" size="small" type="success" plain> easy </el-button>
+              <el-button v-if="descriptionData.difficulty === 2" size="small" type="warning" plain> medium </el-button>
+              <el-button v-if="descriptionData.difficulty === 3" size="small" type="danger" plain> hard </el-button>
             </el-descriptions-item>
             <el-descriptions-item label="内容">{{ descriptionData.content }}</el-descriptions-item>
           </el-descriptions>

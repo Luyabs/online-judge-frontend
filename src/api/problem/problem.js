@@ -1,24 +1,25 @@
 import request from '@/utils/request'
 
-export function sayHello() {
-  return request({
-    url: '/vue-admin-template/problem/hello',
-    method: 'get'
-  })
-}
-
 export function getPage(params) {
   return request({
-    url: '/vue-admin-template/problem/page',
+    url: '/problem/page',
     method: 'get',
     params
   })
 }
 
-export function getById(id) {
+export function getById(problemId) {
   return request({
-    url: `/vue-admin-template/problem/${id}`,
+    url: `/problem/${problemId}`,
     method: 'get'
+  })
+}
+
+export function getMyUpload(params) {
+  return request({
+    url: `/problem/my_upload`,
+    method: 'get',
+    params
   })
 }
 

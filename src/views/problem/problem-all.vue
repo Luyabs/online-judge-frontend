@@ -7,7 +7,7 @@
         <el-col :span="4"> <el-input v-model="searchType" placeholder="类型" size="medium" prefix-icon="el-icon-search" /> </el-col>
         <el-col :span="4"> <el-input v-model="searchTag" placeholder="标签" size="medium" prefix-icon="el-icon-search" /> </el-col>
         <el-button size="primary" @click="fetchData()"> 查询 </el-button>
-        <el-button size="success" @click="helloWorld()"> Hello! </el-button>
+        <el-button size="success" @click="fetchData()"> Hello! </el-button>
       </el-row>
     </div>
 
@@ -21,21 +21,21 @@
         <el-table-column prop="problemId" label="编号" width="100" align="center" />
         <el-table-column label="完成状态" width="100">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.completionStatus === '已完成'" size="small" type="success">{{ scope.row.completionStatus }}</el-button>
-            <el-button v-if="scope.row.completionStatus === '尝试中'" size="small" type="danger">{{ scope.row.completionStatus }}</el-button>
-            <el-button v-if="scope.row.completionStatus === '未完成'" size="small" type="info">{{ scope.row.completionStatus }}</el-button>
+            <el-button v-if="scope.row.hasDone === 1" size="small" type="success">未完成</el-button>
+            <el-button v-if="scope.row.hasDone === 2" size="small" type="danger">尝试中</el-button>
+            <el-button v-if="scope.row.hasDone === 3" size="small" type="info">已完成</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="problemName" label="题目" width="300" />
+        <el-table-column prop="title" label="题目" width="300" />
         <el-table-column prop="type" label="类型" width="150" />
-        <el-table-column prop="tag" label="标签" width="150" />
-        <el-table-column prop="solution" label="题解" width="100" />
-        <el-table-column prop="passPossibility" label="通过率" width="100" />
+        <el-table-column prop="tags" label="标签" width="150" />
+        <el-table-column prop="solutionNum" label="题解" width="100" />
+        <el-table-column prop="passRate" label="通过率" width="100" />
         <el-table-column label="难度" width="120">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.level === 'EZ'" size="small" type="success" plain>{{ scope.row.level }}</el-button>
-            <el-button v-if="scope.row.level === 'MEDIUM'" size="small" type="warning" plain>{{ scope.row.level }}</el-button>
-            <el-button v-if="scope.row.level === 'CRAZY'" size="small" type="danger" plain>{{ scope.row.level }}</el-button>
+            <el-button v-if="scope.row.difficulty === 1" size="small" type="success" plain> easy </el-button>
+            <el-button v-if="scope.row.difficulty === 2" size="small" type="warning" plain> medium </el-button>
+            <el-button v-if="scope.row.difficulty === 3" size="small" type="danger" plain> hard </el-button>
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -63,16 +63,20 @@
 
     <!-- 详细信息框 -->
     <div>
-      <el-dialog title="详细信息" :visible.sync="detailedFormVisible" width="30%">
+      <el-dialog title="详细信息" :visible.sync="detailedFormVisible" width="40%">
         <el-form label-position="right" label-width="80px">
           <el-form-item label="编号"> <el-input v-model="detailedFormData.problemId" disabled /> </el-form-item>
-          <el-form-item label="完成状态"> <el-input v-model="detailedFormData.completionStatus" disabled /> </el-form-item>
-          <el-form-item label="题目"> <el-input v-model="detailedFormData.problemName" disabled /> </el-form-item>
+          <el-form-item label="作者"> <el-input v-model="detailedFormData.userId" disabled /> </el-form-item>
+          <el-form-item label="标题"> <el-input v-model="detailedFormData.title" disabled /> </el-form-item>
+          <el-form-item label="内容"> <el-input v-model="detailedFormData.content" disabled /> </el-form-item>
           <el-form-item label="类型"> <el-input v-model="detailedFormData.type" disabled /> </el-form-item>
-          <el-form-item label="标签"> <el-input v-model="detailedFormData.tag" disabled /> </el-form-item>
-          <el-form-item label="题解"> <el-input v-model="detailedFormData.solution" disabled /> </el-form-item>
-          <el-form-item label="通过率"> <el-input v-model="detailedFormData.passPossibility" disabled /> </el-form-item>
-          <el-form-item label="难度"> <el-input v-model="detailedFormData.level" disabled /> </el-form-item>
+          <el-form-item label="练习人次"> <el-input v-model="detailedFormData.attemptNum" disabled /> </el-form-item>
+          <el-form-item label="通过人次"> <el-input v-model="detailedFormData.successNum" disabled /> </el-form-item>
+          <el-form-item label="难度"> <el-input v-model="detailedFormData.difficulty" disabled /> </el-form-item>
+          <el-form-item label="时间限制"> <el-input v-model="detailedFormData.runtimeLimit" disabled /> </el-form-item>
+          <el-form-item label="内存限制"> <el-input v-model="detailedFormData.memoryLimit" disabled /> </el-form-item>
+          <el-form-item label="更新时间"> <el-input v-model="detailedFormData.updateTime" disabled /> </el-form-item>
+          <el-form-item label="创建时间"> <el-input v-model="detailedFormData.insertTime" disabled /> </el-form-item>
 
         </el-form>
 
@@ -87,7 +91,7 @@
 </template>
 
 <script>
-import { getById, getPage, sayHello } from '@/api/problem/problem'
+import { getById, getPage } from '@/api/problem/problem'
 
 export default {
   data() {
@@ -110,13 +114,6 @@ export default {
     this.fetchData()
   },
   methods: {
-    // hello-world
-    helloWorld() {
-      sayHello().then(response => {
-        this.$message.success(response.data.hello + ' ' + this.searchProblem + ' ' + this.searchType + ' ' + this.searchTag)
-      })
-    },
-
     // 改变每页大小
     handleSizeChange(val) {
       this.pageSize = val
@@ -139,14 +136,15 @@ export default {
       const params = {
         currentPage: this.currentPage,
         pageSize: this.pageSize,
-        problem: this.searchProblem,
-        type: this.searchType,
-        tag: this.searchTag
+        title: this.title, // 条件查询 标题
+        type: this.searchType, // 条件查询 题目类型
+        tag: this.searchTag, // 条件查询 题目标签
+        isVerified: true // 已审核通过
       }
       getPage(params).then(response => {
         if (response.success === true) {
-          this.tableData = response.data.page.problems
-          this.total = response.data.total
+          this.tableData = response.data.page.records
+          this.total = response.data.page.total
         } else { this.$message.error(response.message) }
       })
     },
