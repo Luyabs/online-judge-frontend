@@ -3,9 +3,18 @@
     <!-- 搜索框 与 新增 -->
     <div style="margin-top: 20px; margin-left: 20px;">
       <el-row :gutter="20">
-        <el-col :span="4"> <el-input v-model="searchProblem" placeholder="题目" size="medium" prefix-icon="el-icon-search" /> </el-col>
-        <el-col :span="4"> <el-input v-model="searchType" placeholder="类型" size="medium" prefix-icon="el-icon-search" /> </el-col>
-        <el-col :span="4"> <el-input v-model="searchTag" placeholder="标签" size="medium" prefix-icon="el-icon-search" /> </el-col>
+        <el-col :span="4"> <el-input v-model="searchTitle" placeholder="题目" size="medium" prefix-icon="el-icon-search" /> </el-col>
+        <el-col :span="4"> <el-input v-model="searchTag" placeholder="标签 (目前未实现)" size="medium" prefix-icon="el-icon-search" /> </el-col>
+        <el-col :span="4">
+          <el-select v-model="searchType" placeholder="类型" size="medium" prefix-icon="el-icon-search" clearable>
+            <el-option
+              v-for="item in [{value: 1, label: 'SQL'}, { value: 2, label: '高级语言'}]"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-col>
         <el-button type="primary" @click="fetchData()"> 查询 </el-button>
         <el-button type="success" @click="openAddForm()"> 上传 </el-button>
       </el-row>
@@ -21,9 +30,9 @@
         <el-table-column prop="problemId" label="编号" width="98" align="center" />
         <el-table-column label="审核状态" width="100">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.status === 0" size="small" type="success">正常</el-button>
-            <el-button v-if="scope.row.status === 1" size="small" type="info">待审核</el-button>
-            <el-button v-if="scope.row.status === 2" size="small" type="danger">需修改</el-button>
+            <el-button v-if="scope.row.status === 1" size="small" type="success">正常</el-button>
+            <el-button v-if="scope.row.status === 2" size="small" type="info">审核中</el-button>
+            <el-button v-if="scope.row.status === 3" size="small" type="danger">待修改</el-button>
           </template>
         </el-table-column>
         <el-table-column prop="title" label="标题" width="300" />
@@ -141,9 +150,9 @@ import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
-      searchProblem: '',
-      searchType: '',
+      searchTitle: '',
       searchTag: '',
+      searchType: '',
 
       tableData: [],
       total: 0,
@@ -193,7 +202,7 @@ export default {
       const params = {
         currentPage: this.currentPage,
         pageSize: this.pageSize,
-        title: this.title, // 条件查询 标题
+        title: this.searchTitle, // 条件查询 标题
         type: this.searchType, // 条件查询 题目类型
         tag: this.searchTag // 条件查询 题目标签
       }

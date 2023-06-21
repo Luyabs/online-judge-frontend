@@ -3,9 +3,18 @@
     <!-- 搜索框 与 新增 -->
     <div style="margin-top: 20px; margin-left: 20px;">
       <el-row :gutter="20">
-        <el-col :span="4"> <el-input v-model="searchProblem" placeholder="题目" size="medium" prefix-icon="el-icon-search" /> </el-col>
-        <el-col :span="4"> <el-input v-model="searchType" placeholder="类型" size="medium" prefix-icon="el-icon-search" /> </el-col>
-        <el-col :span="4"> <el-input v-model="searchTag" placeholder="标签" size="medium" prefix-icon="el-icon-search" /> </el-col>
+        <el-col :span="4"> <el-input v-model="searchTitle" placeholder="题目" size="medium" prefix-icon="el-icon-search" /> </el-col>
+        <el-col :span="4"> <el-input v-model="searchTag" placeholder="标签 (目前未实现)" size="medium" prefix-icon="el-icon-search" /> </el-col>
+        <el-col :span="4">
+          <el-select v-model="searchType" placeholder="类型" size="medium" prefix-icon="el-icon-search" clearable>
+            <el-option
+              v-for="item in [{value: 1, label: 'SQL'}, { value: 2, label: '高级语言'}]"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-col>
         <el-button type="primary" @click="fetchData()"> 查询 </el-button>
       </el-row>
     </div>
@@ -36,9 +45,9 @@
         <el-table-column prop="solutionNum" label="题解" width="100" />
         <el-table-column prop="passRate" label="通过率" width="100">
           <template slot-scope="scope">
-          <el-button v-if="scope.row.passRate === null" size="small" plain> - - </el-button>
-          <el-button v-else size="small" plain> {{ scope.row.passRate }} </el-button>
-        </template>
+            <el-button v-if="scope.row.passRate === null" size="small" plain> - - </el-button>
+            <el-button v-else size="small" plain> {{ scope.row.passRate }} </el-button>
+          </template>
         </el-table-column>
         <el-table-column label="难度" width="120">
           <template slot-scope="scope">
@@ -77,7 +86,7 @@
           <el-form-item label="编号"> <el-input v-model="detailedFormData.problemId" /> </el-form-item>
           <el-form-item label="作者"> <el-input v-model="detailedFormData.userId" /> </el-form-item>
           <el-form-item label="标题"> <el-input v-model="detailedFormData.title" /> </el-form-item>
-          <el-form-item label="内容"> <el-input type="textarea" :rows="3" v-model="detailedFormData.content" /> </el-form-item>
+          <el-form-item label="内容"> <el-input v-model="detailedFormData.content" type="textarea" :rows="3" /> </el-form-item>
           <el-form-item label="类型">
             <el-radio-group v-model="detailedFormData.type">
               <el-radio :label="1"> SQL </el-radio>
@@ -116,9 +125,9 @@ import { getById, getPage } from '@/api/problem/problem'
 export default {
   data() {
     return {
-      searchProblem: '',
-      searchType: '',
+      searchTitle: '',
       searchTag: '',
+      searchType: '',
 
       tableData: [],
       total: 0,
@@ -156,10 +165,10 @@ export default {
       const params = {
         currentPage: this.currentPage,
         pageSize: this.pageSize,
-        title: this.title, // 条件查询 标题
+        title: this.searchTitle, // 条件查询 标题
         type: this.searchType, // 条件查询 题目类型
         tag: this.searchTag, // 条件查询 题目标签
-        isVerified: true // 已审核通过
+        status: 1 // 已审核通过
       }
       getPage(params).then(response => {
         if (response.success === true) {

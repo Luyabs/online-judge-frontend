@@ -41,7 +41,14 @@ export function getPage(params) {
 
 export function getById(id) {
   return request({
-    url: `/vue-admin-template/user/${id}`,
+    url: `/user/${id}`,
     method: 'get'
+  })
+}
+
+export function reverseBan(id) {
+  return request({
+    url: `/user/ban/${id}`,
+    method: 'post'
   })
 }
