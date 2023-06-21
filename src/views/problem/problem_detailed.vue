@@ -8,7 +8,10 @@
           <el-descriptions title="垂直带边框列表" direction="vertical" :column="4" border>
             <el-descriptions-item label="编号">{{ descriptionData.problemId }}</el-descriptions-item>
             <el-descriptions-item label="标题">{{ descriptionData.title }}</el-descriptions-item>
-            <el-descriptions-item label="类型">{{ descriptionData.type }}</el-descriptions-item>
+            <el-descriptions-item label="类型">
+              <el-button v-if="descriptionData.type === 1" size="small" type="success" plain> SQL </el-button>
+              <el-button v-if="descriptionData.type === 2" size="small" type="warning" plain> 高级语言 </el-button>
+            </el-descriptions-item>
             <el-descriptions-item label="难度">
               <el-button v-if="descriptionData.difficulty === 1" size="small" type="success" plain> easy </el-button>
               <el-button v-if="descriptionData.difficulty === 2" size="small" type="warning" plain> medium </el-button>
@@ -59,6 +62,9 @@
 
 <script>
 import { getById } from '@/api/problem/problem'
+import lastProblemId from '@/store/modules/last-problem-id'
+import { mapGetters } from 'vuex'
+import store from '@/store'
 
 export default {
   data() {
@@ -71,6 +77,11 @@ export default {
       descriptionData: {} // 描述框数据
     }
   },
+  computed: {
+    ...mapGetters([
+      'last_problem_id'
+    ])
+  },
   created() {
     this.problemId = this.$route.query.problemId
     this.fetchDataById(this.problemId)
@@ -78,12 +89,16 @@ export default {
   methods: {
     // 获取id对应数据的详细信息
     fetchDataById(problemId) {
+      if (problemId == null && lastProblemId.state.problemId !== null && lastProblemId.state.problemId !== -1) { // 如果 vuex里有记忆上一题id 则调用此id
+        problemId = lastProblemId.state.problemId
+      }
       if (problemId == null) {
         this.$notify({
           title: '提醒',
           message: this.$createElement('i', { style: 'color: teal' }, '需要先指定题目id')
         })
         this.$router.push('/problem_set/all')
+        return
       }
       getById(problemId).then(response => {
         if (response.success === true) {
@@ -92,6 +107,7 @@ export default {
           this.$message.error(response.message)
         }
       })
+      store.dispatch('lastProblemId/setProblemId', problemId) // vuex 最后记忆当前问题id
     },
     debug() {
       this.$message.success('调试: ' + this.language + ' ' + this.textarea)

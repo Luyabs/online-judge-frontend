@@ -47,6 +47,12 @@ export const constantRoutes = [
   },
 
   {
+    path: '/test_case',
+    component: () => import('@/views/test_case/test_case'),
+    hidden: true
+  },
+
+  {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true
@@ -74,13 +80,13 @@ export const constantRoutes = [
       {
         path: 'all',
         name: 'all',
-        component: () => import('@/views/problem/problem-all'),
+        component: () => import('@/views/problem/problem_all'),
         meta: { title: '题库', icon: 'el-icon-s-grid' }
       },
       {
         path: 'problem',
         name: 'problem',
-        component: () => import('@/views/problem/problem-detailed'),
+        component: () => import('@/views/problem/problem_detailed'),
         meta: { title: '题目', icon: 'el-icon-thumb' }
       }
     ]

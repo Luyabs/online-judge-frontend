@@ -6,8 +6,7 @@
         <el-col :span="4"> <el-input v-model="searchProblem" placeholder="题目" size="medium" prefix-icon="el-icon-search" /> </el-col>
         <el-col :span="4"> <el-input v-model="searchType" placeholder="类型" size="medium" prefix-icon="el-icon-search" /> </el-col>
         <el-col :span="4"> <el-input v-model="searchTag" placeholder="标签" size="medium" prefix-icon="el-icon-search" /> </el-col>
-        <el-button size="primary" @click="fetchData()"> 查询 </el-button>
-        <el-button size="success" @click="fetchData()"> Hello! </el-button>
+        <el-button type="primary" @click="fetchData()"> 查询 </el-button>
       </el-row>
     </div>
 
@@ -18,19 +17,29 @@
         style="width: 100%"
       >
         <!-- <el-table-column type="index" width="30" align="center"> </el-table-column>-->
-        <el-table-column prop="problemId" label="编号" width="100" align="center" />
+        <el-table-column prop="problemId" label="编号" width="98" align="center" />
         <el-table-column label="完成状态" width="100">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.hasDone === 1" size="small" type="success">未完成</el-button>
+            <el-button v-if="scope.row.hasDone === 1" size="small" type="info">未完成</el-button>
             <el-button v-if="scope.row.hasDone === 2" size="small" type="danger">尝试中</el-button>
-            <el-button v-if="scope.row.hasDone === 3" size="small" type="info">已完成</el-button>
+            <el-button v-if="scope.row.hasDone === 3" size="small" type="success">已完成</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="title" label="题目" width="300" />
-        <el-table-column prop="type" label="类型" width="150" />
+        <el-table-column prop="title" label="标题" width="300" />
+        <el-table-column label="类型" width="150">
+          <template slot-scope="scope">
+            <el-button v-if="scope.row.type === 1" size="small" type="success" plain> SQL </el-button>
+            <el-button v-if="scope.row.type === 2" size="small" type="warning" plain> 高级语言 </el-button>
+          </template>
+        </el-table-column>
         <el-table-column prop="tags" label="标签" width="150" />
         <el-table-column prop="solutionNum" label="题解" width="100" />
-        <el-table-column prop="passRate" label="通过率" width="100" />
+        <el-table-column prop="passRate" label="通过率" width="100">
+          <template slot-scope="scope">
+          <el-button v-if="scope.row.passRate === null" size="small" plain> - - </el-button>
+          <el-button v-else size="small" plain> {{ scope.row.passRate }} </el-button>
+        </template>
+        </el-table-column>
         <el-table-column label="难度" width="120">
           <template slot-scope="scope">
             <el-button v-if="scope.row.difficulty === 1" size="small" type="success" plain> easy </el-button>
@@ -65,18 +74,29 @@
     <div>
       <el-dialog title="详细信息" :visible.sync="detailedFormVisible" width="40%">
         <el-form label-position="right" label-width="80px">
-          <el-form-item label="编号"> <el-input v-model="detailedFormData.problemId" disabled /> </el-form-item>
-          <el-form-item label="作者"> <el-input v-model="detailedFormData.userId" disabled /> </el-form-item>
-          <el-form-item label="标题"> <el-input v-model="detailedFormData.title" disabled /> </el-form-item>
-          <el-form-item label="内容"> <el-input v-model="detailedFormData.content" disabled /> </el-form-item>
-          <el-form-item label="类型"> <el-input v-model="detailedFormData.type" disabled /> </el-form-item>
-          <el-form-item label="练习人次"> <el-input v-model="detailedFormData.attemptNum" disabled /> </el-form-item>
-          <el-form-item label="通过人次"> <el-input v-model="detailedFormData.successNum" disabled /> </el-form-item>
-          <el-form-item label="难度"> <el-input v-model="detailedFormData.difficulty" disabled /> </el-form-item>
-          <el-form-item label="时间限制"> <el-input v-model="detailedFormData.runtimeLimit" disabled /> </el-form-item>
-          <el-form-item label="内存限制"> <el-input v-model="detailedFormData.memoryLimit" disabled /> </el-form-item>
-          <el-form-item label="更新时间"> <el-input v-model="detailedFormData.updateTime" disabled /> </el-form-item>
-          <el-form-item label="创建时间"> <el-input v-model="detailedFormData.insertTime" disabled /> </el-form-item>
+          <el-form-item label="编号"> <el-input v-model="detailedFormData.problemId" /> </el-form-item>
+          <el-form-item label="作者"> <el-input v-model="detailedFormData.userId" /> </el-form-item>
+          <el-form-item label="标题"> <el-input v-model="detailedFormData.title" /> </el-form-item>
+          <el-form-item label="内容"> <el-input type="textarea" :rows="3" v-model="detailedFormData.content" /> </el-form-item>
+          <el-form-item label="类型">
+            <el-radio-group v-model="detailedFormData.type">
+              <el-radio :label="1"> SQL </el-radio>
+              <el-radio :label="2"> 高级语言 </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="难度">
+            <el-radio-group v-model="detailedFormData.difficulty">
+              <el-radio :label="1"> 简单 </el-radio>
+              <el-radio :label="2"> 中等 </el-radio>
+              <el-radio :label="3"> 困难 </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="练习人次"> <el-input v-model="detailedFormData.attemptNum" /> </el-form-item>
+          <el-form-item label="通过人次"> <el-input v-model="detailedFormData.successNum" /> </el-form-item>
+          <el-form-item label="时间限制"> <el-input v-model="detailedFormData.runtimeLimit" /> </el-form-item>
+          <el-form-item label="内存限制"> <el-input v-model="detailedFormData.memoryLimit" /> </el-form-item>
+          <el-form-item label="更新时间"> <el-input v-model="detailedFormData.updateTime" /> </el-form-item>
+          <el-form-item label="创建时间"> <el-input v-model="detailedFormData.insertTime" /> </el-form-item>
 
         </el-form>
 
@@ -163,7 +183,6 @@ export default {
 
     // 享受oj
     enjoy(problemId) {
-      // alert('享受OJ: ' + problemId)
       this.$router.push({
         path: '/problem_set/problem',
         query: {

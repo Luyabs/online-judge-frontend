@@ -3,6 +3,7 @@
     <div>
       <el-descriptions class="margin-top" title="个人信息" :column="3" :size="'medium'">
         <el-descriptions-item label="用户ID">{{ userId }}</el-descriptions-item>
+        <el-descriptions-item label="身份">{{ roles[0] }}</el-descriptions-item>
         <el-descriptions-item label="用户名">{{ username }}</el-descriptions-item>
         <el-descriptions-item label="昵称">{{ nickname }}</el-descriptions-item>
         <el-descriptions-item label="加入时间">{{ insertTime }}</el-descriptions-item>
@@ -29,7 +30,8 @@ export default {
     ...mapGetters([
       'name',
       'avatar',
-      'token'
+      'token',
+      'roles'
     ])
   },
   data() {

@@ -17,9 +17,32 @@ export function getById(problemId) {
 
 export function getMyUpload(params) {
   return request({
-    url: `/problem/my_upload`,
+    url: '/problem/my_upload',
     method: 'get',
     params
+  })
+}
+
+export function upload(data) {
+  return request({
+    url: '/problem/my_upload',
+    method: 'post',
+    data
+  })
+}
+
+export function modify(data) {
+  return request({
+    url: '/problem/my_upload',
+    method: 'put',
+    data
+  })
+}
+
+export function remove(id) {
+  return request({
+    url: `/problem/my_upload/${id}`,
+    method: 'delete'
   })
 }
 
