@@ -47,12 +47,6 @@ export const constantRoutes = [
   },
 
   {
-    path: '/test_case',
-    component: () => import('@/views/test_case/test_case'),
-    hidden: true
-  },
-
-  {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true
@@ -104,6 +98,14 @@ export const constantRoutes = [
         name: '',
         component: () => import('@/views/my_upload/my_upload'),
         meta: { title: '我的上传', icon: 'el-icon-upload2' }
+      },
+
+      {
+        path: '/test_case',
+        name: 'test_case',
+        component: () => import('@/views/test_case/test_case'),
+        hidden: true,
+        meta: { title: '测试用例', icon: 'el-icon-upload2' }
       }
     ]
   },
@@ -152,7 +154,7 @@ export const asyncRoutes = [
       {
         path: 'judgement',
         name: 'judgement',
-        component: () => import('@/views/admin/judgement'),
+        component: () => import('@/views/admin/problem_audit'),
         meta: { title: '审批题目变更', icon: 'el-icon-s-check' }
       },
       {

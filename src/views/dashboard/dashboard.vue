@@ -8,10 +8,6 @@
         <el-descriptions-item label="昵称">{{ nickname }}</el-descriptions-item>
         <el-descriptions-item label="加入时间">{{ insertTime }}</el-descriptions-item>
         <el-descriptions-item label="个人介绍">{{ introduction }}</el-descriptions-item>
-        <el-descriptions-item label="备注">
-          <el-tag size="small">学校</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="联系地址">上大路99号 上海大专</el-descriptions-item>
       </el-descriptions>
     </div>
 
@@ -26,14 +22,6 @@ import { mapGetters } from 'vuex'
 import { getInfo } from '@/api/user/user'
 
 export default {
-  computed: {
-    ...mapGetters([
-      'name',
-      'avatar',
-      'token',
-      'roles'
-    ])
-  },
   data() {
     return {
       userId: 0,
@@ -42,6 +30,14 @@ export default {
       insertTime: '',
       introduction: ''
     }
+  },
+  computed: {
+    ...mapGetters([
+      'name',
+      'avatar',
+      'token',
+      'roles'
+    ])
   },
   // 获取用户自身信息
   created() {

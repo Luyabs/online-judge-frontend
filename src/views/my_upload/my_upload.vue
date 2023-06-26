@@ -43,7 +43,6 @@
           </template>
         </el-table-column>
         <el-table-column prop="tags" label="标签" width="150" />
-        <el-table-column prop="solutionNum" label="题解" width="100" />
         <el-table-column prop="passRate" label="通过率" width="100">
           <template slot-scope="scope">
             <el-button v-if="scope.row.passRate === null" size="small" plain> - - </el-button>
@@ -59,6 +58,7 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
+            <el-button type="success" @click="editTestCase(scope.row.problemId)">测试用例</el-button>
             <el-button type="primary" size="medium" @click="openEditForm(scope.row.problemId)"> 修改 </el-button>
             <el-button type="warning" size="medium" @click="remove(scope.row.problemId)"> 删除 </el-button>
           </template>
@@ -135,7 +135,7 @@
         <span slot="footer" class="dialog-footer">
           <el-button @click="editFormVisible = false">取消</el-button>
           <el-button type="success" @click="editTestCase(editFormData.problemId)">编辑测试用例</el-button>
-          <el-button type="primary" @click="editConfirm(editFormData.problemId)">确定修改</el-button>
+          <el-button type="primary" @click="editConfirm()">确定修改</el-button>
         </span>
       </el-dialog>
     </div>
@@ -269,7 +269,7 @@ export default {
     },
 
     // 确认修改
-    editConfirm(problemId) {
+    editConfirm() {
       modify(this.editFormData).then(response => {
         if (response.success === true) {
           if (this.roles[0] === 'admin') {

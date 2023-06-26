@@ -31,8 +31,14 @@
         <el-table-column prop="insertTime" label="加入本站时间" width="150" />
         <el-table-column label="封禁状态" width="120">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.isBanned === false" size="small" type="success" plain @click="changeBanStatus(scope.row.userId)">正常</el-button>
-            <el-button v-if="scope.row.isBanned === true" size="small" type="warning" plain @click="changeBanStatus(scope.row.userId)">被封禁</el-button>
+            <el-switch
+              v-model="scope.row.isBanned"
+              active-color="#ff4949"
+              inactive-color="#13ce66"
+              disabled
+            />
+            <!--            <el-button v-if="scope.row.isBanned === false" size="small" type="success" plain @click="changeBanStatus(scope.row.userId)">正常</el-button>-->
+            <!--            <el-button v-if="scope.row.isBanned === true" size="small" type="warning" plain @click="changeBanStatus(scope.row.userId)">被封禁</el-button>-->
           </template>
         </el-table-column>
         <el-table-column label="操作">

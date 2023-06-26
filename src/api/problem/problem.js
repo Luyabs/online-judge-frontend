@@ -8,6 +8,14 @@ export function getPage(params) {
   })
 }
 
+export function getPageInAdmin(params) {
+  return request({
+    url: '/problem/admin/page',
+    method: 'get',
+    params
+  })
+}
+
 export function getById(problemId) {
   return request({
     url: `/problem/${problemId}`,

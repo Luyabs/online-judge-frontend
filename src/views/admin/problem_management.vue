@@ -3,11 +3,20 @@
     <!-- 搜索框 与 新增 -->
     <div style="margin-top: 20px; margin-left: 20px;">
       <el-row :gutter="20">
-        <el-col :span="4"> <el-input v-model="searchProblem" placeholder="题目" size="medium" prefix-icon="el-icon-search" /> </el-col>
-        <el-col :span="4"> <el-input v-model="searchType" placeholder="类型" size="medium" prefix-icon="el-icon-search" /> </el-col>
-        <el-col :span="4"> <el-input v-model="searchTag" placeholder="标签" size="medium" prefix-icon="el-icon-search" /> </el-col>
-        <el-button size="primary" @click="fetchData()"> 查询 </el-button>
-        <el-button size="success" @click="openAddForm()"> 上传新题目 </el-button>
+        <el-col :span="4"> <el-input v-model="searchTitle" placeholder="题目" size="medium" prefix-icon="el-icon-search" /> </el-col>
+        <el-col :span="4"> <el-input v-model="searchTag" placeholder="标签 (目前未实现)" size="medium" prefix-icon="el-icon-search" /> </el-col>
+        <el-col :span="4">
+          <el-select v-model="searchType" placeholder="类型" size="medium" prefix-icon="el-icon-search" clearable>
+            <el-option
+              v-for="item in [{value: 1, label: 'SQL'}, { value: 2, label: '高级语言'}]"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-col>
+        <el-button type="primary" @click="fetchData()"> 查询 </el-button>
+        <el-button type="success" @click="openAddForm()"> 上传 </el-button>
       </el-row>
     </div>
 
@@ -18,28 +27,38 @@
         style="width: 100%"
       >
         <!-- <el-table-column type="index" width="30" align="center"> </el-table-column>-->
-        <el-table-column prop="problemId" label="编号" width="100" align="center" />
-        <el-table-column label="完成状态" width="100">
+        <el-table-column prop="problemId" label="编号" width="98" align="center" />
+        <el-table-column label="审核状态" width="100">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.completionStatus === '已完成'" size="small" type="success">{{ scope.row.completionStatus }}</el-button>
-            <el-button v-if="scope.row.completionStatus === '尝试中'" size="small" type="danger">{{ scope.row.completionStatus }}</el-button>
-            <el-button v-if="scope.row.completionStatus === '未完成'" size="small" type="info">{{ scope.row.completionStatus }}</el-button>
+            <el-button v-if="scope.row.status === 1" size="small" type="success">正常</el-button>
+            <el-button v-if="scope.row.status === 2" size="small" type="info">审核中</el-button>
+            <el-button v-if="scope.row.status === 3" size="small" type="danger">待修改</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="problemName" label="题目" width="300" />
-        <el-table-column prop="type" label="类型" width="150" />
-        <el-table-column prop="tag" label="标签" width="150" />
-        <el-table-column prop="solution" label="题解" width="100" />
-        <el-table-column prop="passPossibility" label="通过率" width="100" />
+        <el-table-column prop="title" label="标题" width="300" />
+        <el-table-column label="类型" width="150">
+          <template slot-scope="scope">
+            <el-button v-if="scope.row.type === 1" size="small" type="success" plain> SQL </el-button>
+            <el-button v-if="scope.row.type === 2" size="small" type="warning" plain> 高级语言 </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="tags" label="标签" width="150" />
+        <el-table-column prop="passRate" label="通过率" width="100">
+          <template slot-scope="scope">
+            <el-button v-if="scope.row.passRate === null" size="small" plain> - - </el-button>
+            <el-button v-else size="small" plain> {{ scope.row.passRate }} </el-button>
+          </template>
+        </el-table-column>
         <el-table-column label="难度" width="120">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.level === 'EZ'" size="small" type="success" plain>{{ scope.row.level }}</el-button>
-            <el-button v-if="scope.row.level === 'MEDIUM'" size="small" type="warning" plain>{{ scope.row.level }}</el-button>
-            <el-button v-if="scope.row.level === 'CRAZY'" size="small" type="danger" plain>{{ scope.row.level }}</el-button>
+            <el-button v-if="scope.row.difficulty === 1" size="small" type="success" plain> easy </el-button>
+            <el-button v-if="scope.row.difficulty === 2" size="small" type="warning" plain> medium </el-button>
+            <el-button v-if="scope.row.difficulty === 3" size="small" type="danger" plain> hard </el-button>
           </template>
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
+            <el-button type="success" @click="editTestCase(scope.row.problemId)">测试用例</el-button>
             <el-button type="primary" size="medium" @click="openEditForm(scope.row.problemId)"> 修改 </el-button>
             <el-button type="warning" size="medium" @click="remove(scope.row.problemId)"> 删除 </el-button>
           </template>
@@ -65,14 +84,23 @@
     <div>
       <el-dialog title="新增信息" :visible.sync="addFormVisible" width="30%">
         <el-form label-position="right" label-width="80px">
-          <el-form-item label="编号"> <el-input v-model="addFormData.problemId" /> </el-form-item>
-          <el-form-item label="完成状态"> <el-input v-model="addFormData.completionStatus" /> </el-form-item>
-          <el-form-item label="题目"> <el-input v-model="addFormData.problemName" /> </el-form-item>
-          <el-form-item label="类型"> <el-input v-model="addFormData.type" /> </el-form-item>
-          <el-form-item label="标签"> <el-input v-model="addFormData.tag" /> </el-form-item>
-          <el-form-item label="题解"> <el-input v-model="addFormData.solution" /> </el-form-item>
-          <el-form-item label="通过率"> <el-input v-model="addFormData.passPossibility" /> </el-form-item>
-          <el-form-item label="难度"> <el-input v-model="addFormData.level" /> </el-form-item>
+          <el-form-item label="标题" required> <el-input v-model="addFormData.title" /> </el-form-item>
+          <el-form-item label="内容" required> <el-input type="textarea" :rows="3" v-model="addFormData.content" /> </el-form-item>
+          <el-form-item label="类型" required>
+            <el-radio-group v-model="addFormData.type">
+              <el-radio :label="1"> SQL </el-radio>
+              <el-radio :label="2"> 高级语言 </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="难度" required>
+            <el-radio-group v-model="addFormData.difficulty">
+              <el-radio :label="1"> 简单 </el-radio>
+              <el-radio :label="2"> 中等 </el-radio>
+              <el-radio :label="3"> 困难 </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="时间限制"> <el-input v-model="addFormData.runtimeLimit" /> </el-form-item>
+          <el-form-item label="内存限制"> <el-input v-model="addFormData.memoryLimit" /> </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="addFormVisible = false">取消</el-button>
@@ -85,17 +113,28 @@
     <div>
       <el-dialog title="修改信息" :visible.sync="editFormVisible" width="30%">
         <el-form label-position="right" label-width="80px">
-          <el-form-item label="编号"> <el-input v-model="editFormData.problemId" /> </el-form-item>
-          <el-form-item label="完成状态"> <el-input v-model="editFormData.completionStatus" /> </el-form-item>
-          <el-form-item label="题目"> <el-input v-model="editFormData.problemName" /> </el-form-item>
-          <el-form-item label="类型"> <el-input v-model="editFormData.type" /> </el-form-item>
-          <el-form-item label="标签"> <el-input v-model="editFormData.tag" /> </el-form-item>
-          <el-form-item label="题解"> <el-input v-model="editFormData.solution" /> </el-form-item>
-          <el-form-item label="通过率"> <el-input v-model="editFormData.passPossibility" /> </el-form-item>
-          <el-form-item label="难度"> <el-input v-model="editFormData.level" /> </el-form-item>
+          <el-form-item label="编号"> <el-input v-model="editFormData.problemId" disabled /> </el-form-item>
+          <el-form-item label="标题" required> <el-input v-model="editFormData.title" /> </el-form-item>
+          <el-form-item label="内容" required> <el-input type="textarea" :rows="2" v-model="editFormData.content" /> </el-form-item>
+          <el-form-item label="类型" required>
+            <el-radio-group v-model="editFormData.type">
+              <el-radio :label="1"> SQL </el-radio>
+              <el-radio :label="2"> 高级语言 </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="难度" required>
+            <el-radio-group v-model="editFormData.difficulty">
+              <el-radio :label="1"> 简单 </el-radio>
+              <el-radio :label="2"> 中等 </el-radio>
+              <el-radio :label="3"> 困难 </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="时间限制"> <el-input v-model="editFormData.runtimeLimit" /> </el-form-item>
+          <el-form-item label="内存限制"> <el-input v-model="editFormData.memoryLimit" /> </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="editFormVisible = false">取消</el-button>
+          <el-button type="success" @click="editTestCase(editFormData.problemId)">编辑测试用例</el-button>
           <el-button type="primary" @click="editConfirm(editFormData.problemId)">确定修改</el-button>
         </span>
       </el-dialog>
@@ -105,14 +144,15 @@
 </template>
 
 <script>
-import { getById, getPage } from '@/api/problem/problem'
+import { getById, getPageInAdmin, modify, remove, upload } from '@/api/problem/problem'
+import { mapGetters } from 'vuex'
 
 export default {
   data() {
     return {
-      searchProblem: '',
-      searchType: '',
+      searchTitle: '',
       searchTag: '',
+      searchType: '',
 
       tableData: [],
       total: 0,
@@ -125,6 +165,11 @@ export default {
       editFormVisible: false // 修改信息表单可见度
 
     }
+  },
+  computed: {
+    ...mapGetters([
+      'roles'
+    ])
   },
   created() {
     this.fetchData()
@@ -157,14 +202,14 @@ export default {
       const params = {
         currentPage: this.currentPage,
         pageSize: this.pageSize,
-        problem: this.searchProblem,
-        type: this.searchType,
-        tag: this.searchTag
+        title: this.searchTitle, // 条件查询 标题
+        type: this.searchType, // 条件查询 题目类型
+        tag: this.searchTag // 条件查询 题目标签
       }
-      getPage(params).then(response => {
+      getPageInAdmin(params).then(response => {
         if (response.success === true) {
-          this.tableData = response.data.page.problems
-          this.total = response.data.total
+          this.tableData = response.data.page.records
+          this.total = response.data.page.total
         } else { this.$message.error(response.message) }
       })
     },
@@ -178,10 +223,20 @@ export default {
 
     // 新增题目
     addConfirm() {
-      // TODO: 上传接口
-      this.$message.success('上传成功')
-      this.addFormVisible = false
-      this.fetchData()
+      upload(this.addFormData).then(response => {
+        if (response.success === true) {
+          if (this.roles[0] === 'admin') {
+            this.$message.success('上次成功')
+          } else {
+            this.$message.success('已上传, 待审核')
+          }
+          this.addFormVisible = false
+        } else {
+          this.$message.error(response.message)
+        }
+      }).finally(() => {
+        this.fetchData()
+      })
     },
 
     // 打开修改窗口
@@ -190,18 +245,43 @@ export default {
       getById(problemId).then(response => {
         if (response.success === true) {
           this.editFormVisible = true
-          this.editFormData = response.data.problem
-          this.editFormData.problemId = problemId
+          const problem = response.data.problem
+          this.editFormData = {
+            problemId: problem.problemId,
+            title: problem.title,
+            content: problem.content,
+            type: problem.type,
+            difficulty: problem.difficulty,
+            runtimeLimit: problem.runtimeLimit,
+            memoryLimit: problem.memoryLimit
+          }
         } else { this.$message.error(response.message) }
+      })
+    },
+
+    editTestCase(problemId) {
+      this.$router.push({
+        path: '/test_case',
+        query: {
+          problemId: problemId
+        }
       })
     },
 
     // 确认修改
     editConfirm(problemId) {
-      // TODO: 修改接口，提供修改题目内容，测试用例的按钮
-      this.$message.success('修改成功')
-      this.editFormVisible = false
-      this.fetchData()
+      modify(this.editFormData).then(response => {
+        if (response.success === true) {
+          if (this.roles[0] === 'admin') {
+            this.$message.success('修改成功')
+          } else {
+            this.$message.success('已提交修改, 待审核')
+          }
+          this.editFormVisible = false
+        } else { this.$message.error(response.message) }
+      }).finally(() => {
+        this.fetchData()
+      })
     },
 
     // 删除
@@ -211,9 +291,18 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // TODO: 删除接口
-        this.$message.success('删除成功')
-        this.fetchData()
+        remove(problemId).then(response => {
+          if (response.success === true) {
+            if (this.roles[0] === 'admin') {
+              this.$message.success('删除成功')
+            } else {
+              this.$message.success('已提交删除请求, 待审核')
+            }
+            this.editFormVisible = false
+          } else { this.$message.error(response.message) }
+        }).finally(() => {
+          this.fetchData()
+        })
       }).catch(() => {
         this.$message.info('已取消删除')
       })
