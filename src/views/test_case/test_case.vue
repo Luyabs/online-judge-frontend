@@ -66,9 +66,9 @@
     <div>
       <el-dialog title="新增信息" :visible.sync="addFormVisible" width="30%">
         <el-form label-position="right" label-width="80px">
-          <el-form-item label="测试输入"> <el-input v-model="addFormData.input" type="textarea" :rows="3" /> </el-form-item>
-          <el-form-item label="预期输出"> <el-input v-model="addFormData.output" type="textarea" :rows="3" /> </el-form-item>
-          <el-form-item label="用例描述"> <el-input v-model="addFormData.description" type="textarea" :rows="3" /> </el-form-item>
+          <el-form-item label="测试输入"> <el-input v-model="addFormData.input" type="textarea" :rows="3" autosize /> </el-form-item>
+          <el-form-item label="预期输出"> <el-input v-model="addFormData.output" type="textarea" :rows="3" autosize /> </el-form-item>
+          <el-form-item label="用例描述"> <el-input v-model="addFormData.description" type="textarea" :rows="3" autosize /> </el-form-item>
           <el-form-item label="前置处理">
             <el-switch v-model="addFormData.isPrehandle" />
           </el-form-item>
@@ -91,9 +91,9 @@
       <el-dialog title="修改信息" :visible.sync="editFormVisible" width="30%">
         <el-form label-position="right" label-width="80px">
           <el-form-item label="编号"> <el-input v-model="editFormData.testCaseId" disabled/> </el-form-item>
-          <el-form-item label="测试输入"> <el-input v-model="editFormData.input" type="textarea" :rows="3" /> </el-form-item>
-          <el-form-item label="预期输出"> <el-input v-model="editFormData.output" type="textarea" :rows="3" /> </el-form-item>
-          <el-form-item label="用例描述"> <el-input v-model="editFormData.description" type="textarea" :rows="3" /> </el-form-item>
+          <el-form-item label="测试输入"> <el-input v-model="editFormData.input" type="textarea" :rows="3" autosize/> </el-form-item>
+          <el-form-item label="预期输出"> <el-input v-model="editFormData.output" type="textarea" :rows="3" autosize/> </el-form-item>
+          <el-form-item label="用例描述"> <el-input v-model="editFormData.description" type="textarea" :rows="3" autosize/> </el-form-item>
           <el-form-item label="前置处理">
             <el-switch v-model="editFormData.isPrehandle" />
           </el-form-item>
@@ -201,11 +201,7 @@ export default {
     addConfirm() {
       upload(this.addFormData).then(response => {
         if (response.success === true) {
-          if (this.roles[0] === 'admin') {
-            this.$message.success('上次成功')
-          } else {
-            this.$message.success('已上传, 待审核')
-          }
+          this.$message.success('上次成功')
           this.addFormVisible = false
         } else {
           this.$message.error(response.message)
@@ -240,11 +236,7 @@ export default {
     editConfirm() {
       modify(this.editFormData).then(response => {
         if (response.success === true) {
-          if (this.roles[0] === 'admin') {
-            this.$message.success('修改成功')
-          } else {
-            this.$message.success('已提交修改, 待审核')
-          }
+          this.$message.success('修改成功')
           this.editFormVisible = false
         } else { this.$message.error(response.message) }
       }).finally(() => {
@@ -261,11 +253,7 @@ export default {
       }).then(() => {
         remove(testCaseId).then(response => {
           if (response.success === true) {
-            if (this.roles[0] === 'admin') {
-              this.$message.success('删除成功')
-            } else {
-              this.$message.success('已提交删除请求, 待审核')
-            }
+            this.$message.success('删除成功')
             this.editFormVisible = false
           } else { this.$message.error(response.message) }
         }).finally(() => {

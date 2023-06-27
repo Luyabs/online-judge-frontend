@@ -51,8 +51,10 @@
       </el-row>
 
       <div class="tips">
-        <span style="margin-right:20px;">username: admin / u1 / u2</span>
-        <span> password: 123456</span>
+        <span style="margin-right:20px;">username: admin / u1 </span>
+        <span> password: 123456 </span>
+        <hr />
+        <span> 密码传输时已采用非对称加密 </span>
       </div>
 
     </el-form>
@@ -60,7 +62,7 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+import md5 from 'md5'
 
 export default {
   name: 'Login',

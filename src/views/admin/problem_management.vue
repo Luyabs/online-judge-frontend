@@ -30,30 +30,30 @@
         <el-table-column prop="problemId" label="编号" width="98" align="center" />
         <el-table-column label="审核状态" width="100">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.status === 1" size="small" type="success">正常</el-button>
-            <el-button v-if="scope.row.status === 2" size="small" type="info">审核中</el-button>
-            <el-button v-if="scope.row.status === 3" size="small" type="danger">待修改</el-button>
+            <el-tag @click="showVerifyMessage(scope.row.problemId)" v-if="scope.row.status === 1" type="success">正常</el-tag>
+            <el-tag @click="showVerifyMessage(scope.row.problemId)" v-if="scope.row.status === 2" type="info">审核中</el-tag>
+            <el-tag @click="showVerifyMessage(scope.row.problemId)" v-if="scope.row.status === 3" type="danger">待修改</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="title" label="标题" width="300" />
         <el-table-column label="类型" width="150">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.type === 1" size="small" type="success" plain> SQL </el-button>
-            <el-button v-if="scope.row.type === 2" size="small" type="warning" plain> 高级语言 </el-button>
+            <el-tag v-if="scope.row.type === 1" type="success" plain> SQL </el-tag>
+            <el-tag v-if="scope.row.type === 2" type="warning" plain> 高级语言 </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="tags" label="标签" width="150" />
         <el-table-column prop="passRate" label="通过率" width="100">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.passRate === null" size="small" plain> - - </el-button>
-            <el-button v-else size="small" plain> {{ scope.row.passRate }} </el-button>
+            <el-tag v-if="scope.row.passRate === null" plain> - - </el-tag>
+            <el-tag v-else plain> {{ scope.row.passRate }} </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="难度" width="120">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.difficulty === 1" size="small" type="success" plain> easy </el-button>
-            <el-button v-if="scope.row.difficulty === 2" size="small" type="warning" plain> medium </el-button>
-            <el-button v-if="scope.row.difficulty === 3" size="small" type="danger" plain> hard </el-button>
+            <el-tag v-if="scope.row.difficulty === 1" type="success" plain> easy </el-tag>
+            <el-tag v-if="scope.row.difficulty === 2" type="warning" plain> medium </el-tag>
+            <el-tag v-if="scope.row.difficulty === 3" type="danger" plain> hard </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -85,7 +85,7 @@
       <el-dialog title="新增信息" :visible.sync="addFormVisible" width="30%">
         <el-form label-position="right" label-width="80px">
           <el-form-item label="标题" required> <el-input v-model="addFormData.title" /> </el-form-item>
-          <el-form-item label="内容" required> <el-input type="textarea" :rows="3" v-model="addFormData.content" /> </el-form-item>
+          <el-form-item label="内容" required> <el-input v-model="addFormData.content" type="textarea" :rows="3" autosize/> </el-form-item>
           <el-form-item label="类型" required>
             <el-radio-group v-model="addFormData.type">
               <el-radio :label="1"> SQL </el-radio>
@@ -115,7 +115,7 @@
         <el-form label-position="right" label-width="80px">
           <el-form-item label="编号"> <el-input v-model="editFormData.problemId" disabled /> </el-form-item>
           <el-form-item label="标题" required> <el-input v-model="editFormData.title" /> </el-form-item>
-          <el-form-item label="内容" required> <el-input type="textarea" :rows="2" v-model="editFormData.content" /> </el-form-item>
+          <el-form-item label="内容" required> <el-input type="textarea" v-model="editFormData.content" :rows="2" autosize/> </el-form-item>
           <el-form-item label="类型" required>
             <el-radio-group v-model="editFormData.type">
               <el-radio :label="1"> SQL </el-radio>
@@ -144,7 +144,7 @@
 </template>
 
 <script>
-import { getById, getPageInAdmin, modify, remove, upload } from '@/api/problem/problem'
+import { getById, getPageInAdmin, getVerifiedMessageById, modify, remove, upload } from '@/api/problem/problem'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -214,6 +214,27 @@ export default {
       })
     },
 
+    // 展示审核评语
+    showVerifyMessage(problemId) {
+      getVerifiedMessageById(problemId).then(response => {
+        if (response.success === true) {
+          let result = response.data.editRecord.verifyMessage
+          if (result === null || result.trim() === '') {
+            result = '暂无审核信息'
+          }
+          this.$notify({
+            title: '审核信息 id:' + problemId,
+            message: this.$createElement(
+              'i',
+              { style: 'color: teal' },
+              '审核信息: ' + result
+            ),
+            duration: 6000
+          })
+        } else { this.$message.error(response.message) }
+      })
+    },
+
     // 打开新增窗口
     openAddForm() {
       // TODO: 提供新增多级的页面
@@ -242,6 +263,7 @@ export default {
     // 打开修改窗口
     openEditForm(problemId) {
       this.editFormVisibleFormClear()
+      this.showVerifyMessage(problemId)
       getById(problemId).then(response => {
         if (response.success === true) {
           this.editFormVisible = true

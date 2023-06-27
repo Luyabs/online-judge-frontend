@@ -42,6 +42,26 @@
         </span>
       </el-form-item>
 
+      <el-form-item prop="passwordAgain" required>
+        <span class="svg-container">
+          <svg-icon icon-class="password" />
+        </span>
+        <el-input
+          :key="passwordType"
+          ref="passwordAgain"
+          v-model="registerForm.passwordAgain"
+          :type="passwordType"
+          placeholder="PasswordAgain"
+          name="passwordAgain"
+          tabindex="2"
+          auto-complete="on"
+          @keyup.enter.native="handleRegister"
+        />
+        <span class="show-pwd" @click="showPwd">
+          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+        </span>
+      </el-form-item>
+
       <el-form-item prop="nickname" required>
         <span class="svg-container">
           <i class="el-icon-user"></i>
@@ -85,9 +105,12 @@
   </div>
 </template>
 
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
+
 <script>
 import { validUsername } from '@/utils/validate'
 import { register } from '@/api/user/user'
+import md5 from 'md5'
 
 export default {
   name: 'Login',
@@ -107,13 +130,23 @@ export default {
         callback()
       }
     }
+    const validatePasswordAgain = (rule, value, callback) => {
+      if (value.length < 6) {
+        callback(new Error('The password can not be less than 6 digits'))
+      } else if (this.registerForm.password !== value) {
+        callback(new Error('两次密码输入不匹配'))
+      } else {
+        callback()
+      }
+    }
     return {
       registerForm: {
 
       },
       registerRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        passwordAgain: [{ required: true, trigger: 'blur', validator: validatePasswordAgain }]
       },
       loading: false,
       passwordType: 'password',
@@ -143,13 +176,20 @@ export default {
       this.$refs.registerForm.validate(valid => {
         if (valid) {
           this.loading = true
-          register(this.registerForm).then((response) => {
+          const copiedRegisterForm = {
+            username: this.registerForm.username,
+            password: this.registerForm.password,
+            nickname: this.registerForm.nickname,
+            introduction: this.registerForm.introduction
+          }
+          register(copiedRegisterForm).then((response) => {
             if (response.success === true) {
               this.$message.success('注册成功')
               this.$router.push({ path: this.redirect || '/' })
               this.loading = false
               // 登录
-              this.$store.dispatch('user/login', this.registerForm).then(() => {
+              copiedRegisterForm.password = this.registerForm.password
+              this.$store.dispatch('user/login', copiedRegisterForm).then(() => {
                 this.$router.push({ path: this.redirect || '/' })
                 this.loading = false
               }).catch(() => {

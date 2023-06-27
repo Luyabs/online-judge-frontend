@@ -29,31 +29,31 @@
         <el-table-column prop="problemId" label="编号" width="98" align="center" />
         <el-table-column label="完成状态" width="100">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.hasDone === 1" size="small" type="info">未完成</el-button>
-            <el-button v-if="scope.row.hasDone === 2" size="small" type="danger">尝试中</el-button>
-            <el-button v-if="scope.row.hasDone === 3" size="small" type="success">已完成</el-button>
+            <el-tag v-if="scope.row.hasDone === 1" type="info">未完成</el-tag>
+            <el-tag v-if="scope.row.hasDone === 2" type="danger">尝试中</el-tag>
+            <el-tag v-if="scope.row.hasDone === 3" type="success">已完成</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="title" label="标题" width="300" />
         <el-table-column label="类型" width="150">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.type === 1" size="small" type="success" plain> SQL </el-button>
-            <el-button v-if="scope.row.type === 2" size="small" type="warning" plain> 高级语言 </el-button>
+            <el-tag v-if="scope.row.type === 1" type="success" plain> SQL </el-tag>
+            <el-tag v-if="scope.row.type === 2" type="warning" plain> 高级语言 </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="tags" label="标签" width="150" />
         <el-table-column prop="solutionNum" label="题解" width="100" />
         <el-table-column prop="passRate" label="通过率" width="100">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.passRate === null" size="small" plain> - - </el-button>
-            <el-button v-else size="small" plain> {{ scope.row.passRate }} </el-button>
+            <el-tag v-if="scope.row.passRate === null" plain> - - </el-tag>
+            <el-tag v-else plain> {{ scope.row.passRate }} </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="难度" width="120">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.difficulty === 1" size="small" type="success" plain> easy </el-button>
-            <el-button v-if="scope.row.difficulty === 2" size="small" type="warning" plain> medium </el-button>
-            <el-button v-if="scope.row.difficulty === 3" size="small" type="danger" plain> hard </el-button>
+            <el-tag v-if="scope.row.difficulty === 1" type="success" plain> easy </el-tag>
+            <el-tag v-if="scope.row.difficulty === 2" type="warning" plain> medium </el-tag>
+            <el-tag v-if="scope.row.difficulty === 3" type="danger" plain> hard </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -86,7 +86,7 @@
           <el-form-item label="编号"> <el-input v-model="detailedFormData.problemId" /> </el-form-item>
           <el-form-item label="作者"> <el-input v-model="detailedFormData.userId" /> </el-form-item>
           <el-form-item label="标题"> <el-input v-model="detailedFormData.title" /> </el-form-item>
-          <el-form-item label="内容"> <el-input v-model="detailedFormData.content" type="textarea" :rows="3" /> </el-form-item>
+          <el-form-item label="内容"> <el-input v-model="detailedFormData.content" type="textarea" :rows="3" autosize/> </el-form-item>
           <el-form-item label="类型">
             <el-radio-group v-model="detailedFormData.type">
               <el-radio :label="1"> SQL </el-radio>

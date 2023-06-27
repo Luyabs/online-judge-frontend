@@ -18,7 +18,7 @@ export function getById(editRecordId) {
 export function audit(params, editRecordId) {
   return request({
     url: `/audit/${editRecordId}`,
-    method: 'get',
+    method: 'post',
     params
   })
 }

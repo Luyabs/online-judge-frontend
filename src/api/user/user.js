@@ -1,6 +1,8 @@
 import request from '@/utils/request'
+import md5 from 'md5'
 
 export function login(data) {
+  data.password = md5(data.password)
   return request({
     url: '/user/login',
     method: 'post',
@@ -17,6 +19,7 @@ export function getInfo(token) {
 }
 
 export function register(data) {
+  data.password = md5(data.password)
   return request({
     url: '/user/register',
     method: 'post',

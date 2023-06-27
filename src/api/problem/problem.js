@@ -31,6 +31,13 @@ export function getMyUpload(params) {
   })
 }
 
+export function getVerifiedMessageById(editRecordId) {
+  return request({
+    url: `/audit/by_problem_id/${editRecordId}`,
+    method: 'get'
+  })
+}
+
 export function upload(data) {
   return request({
     url: '/problem/my_upload',
