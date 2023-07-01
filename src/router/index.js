@@ -121,13 +121,13 @@ export const constantRoutes = [
         path: '',
         name: '',
         component: () => import('@/views/my_statistic/statistic'),
-        meta: { title: '我的统计', icon: 'el-icon-close' }
+        meta: { title: '我的统计', icon: 'el-icon-trophy-1' }
       },
       {
         path: 'history',
         name: 'history',
         component: () => import('@/views/my_statistic/history'),
-        meta: { title: '历史记录', icon: 'el-icon-close' }
+        meta: { title: '历史记录', icon: 'el-icon-s-marketing' }
       }
     ]
   }

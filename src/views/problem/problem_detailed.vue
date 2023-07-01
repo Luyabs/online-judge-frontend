@@ -175,10 +175,10 @@ export default {
         if (response.success === true) {
           const result = response.data.submission
           if (result.isSuccess) {
-            this.resultTextArea = '[运行成功]\n' + result.runtime + 'ms\n[运行结果]\n' + result.codeResult
+            this.resultTextArea = '[成功]\n' + result.runtime + 'ms\n[运行结果]\n' + result.codeResult
             this.$message.success('运行成功' + '\n' + result.runtime + 'ms')
           } else {
-            this.resultTextArea = '[运行失败]\n' + result.errorType + '\n[运行结果]\n' + result.codeResult
+            this.resultTextArea = '[失败]\n' + result.errorType + '\n[运行结果]\n' + result.codeResult
             this.$message.error('运行失败' + '\n' + result.errorType)
           }
         } else {

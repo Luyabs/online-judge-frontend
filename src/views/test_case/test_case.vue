@@ -22,15 +22,8 @@
       >
         <!-- <el-table-column type="index" width="30" align="center"> </el-table-column>-->
         <el-table-column prop="testCaseId" label="编号" width="98" align="center" />
-        <el-table-column label="审核状态" width="100">
-          <template slot-scope="scope">
-            <el-button v-if="scope.row.isVerified === true" size="small" type="success">正常</el-button>
-            <el-button v-if="scope.row.isVerified === false" size="small" type="danger">未通过</el-button>
-          </template>
-        </el-table-column>
-        <el-table-column prop="verifyMessage" label="审核信息" width="180" align="center" />
-        <el-table-column prop="input" label="测试输入" width="200" />
-        <el-table-column prop="output" label="预期输出" width="200" />
+        <el-table-column prop="input" label="测试输入" width="400" />
+        <el-table-column prop="output" label="预期输出" width="300" />
         <el-table-column prop="description" label="用例描述" width="180" />
         <el-table-column label="优先级" width="150">
           <template slot-scope="scope">
