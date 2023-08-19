@@ -23,6 +23,13 @@ export function getById(problemId) {
   })
 }
 
+export function getByIdAdmin(problemId) {
+  return request({
+    url: `/problem/admin/${problemId}`,
+    method: 'get'
+  })
+}
+
 export function getMyUpload(params) {
   return request({
     url: '/problem/my_upload',

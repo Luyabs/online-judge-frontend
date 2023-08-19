@@ -244,7 +244,7 @@
 
 <script>
 import { audit, getById, getPage } from '@/api/problem/problem-audit'
-import { getById as getProblemById } from '@/api/problem/problem'
+import { getByIdAdmin as getProblemById } from '@/api/problem/problem'
 
 export default {
   data() {
@@ -271,6 +271,8 @@ export default {
   },
   created() {
     this.fetchData()
+    console.log(this.roles[0])
+
   },
   methods: {
     // 改变每页大小
