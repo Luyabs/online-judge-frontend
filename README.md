@@ -8,4 +8,5 @@
 3. 输入npm install --registry=https://registry.npm.taobao.org 安装依赖
 4. 通过npm run dev运行前端项目
 
-`当前暂未部署后端`  
+## 后端地址
+https://github.com/Luyabs/online-judge-backend
